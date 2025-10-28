@@ -1,0 +1,58 @@
+/* public/css/custom.css */
+
+body {
+    background-color: #0d0f12;
+    color: #e8edf3;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #0d0f12;
+}
+.navbar-brand,
+.nav-link {
+    color: #e8edf3;
+    font-weight: 600;
+}
+.nav-link:hover {
+    color: #f4c542 !important;
+}
+
+/* Custom Utility Classes */
+.text-yellow {
+    color: #f4c542;
+}
+.bg-yellow {
+    background-color: #f4c542;
+}
+.dark-card {
+    background-color: #1a2b49;
+    color: #e8edf3;
+    border-radius: 10px;
+    padding: 1rem;
+}
+.alert-box {
+    background-color: #5c697a;
+    border-left: 4px solid #f4c542;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+footer {
+    background-color: #1a2b49;
+    color: #e8edf3;
+}
+.text-yellow {
+    color: #f4c542;
+}
+.navbar-nav .nav-link:hover {
+    color: #f4c542 !important;
+}
+.navbar .shadow {
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+
+
+
+
