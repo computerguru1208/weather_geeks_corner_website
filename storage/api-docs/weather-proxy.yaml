@@ -1,0 +1,176 @@
+openapi: 3.0.3
+info:
+  title: Weather Proxy (Kansas)
+  version: 1.0.3
+  description: |
+    Thin wrapper around api.weather.gov for Kansas use cases.
+    Includes per-operation externalDocs links, rich examples, and standardized error responses.
+
+servers:
+  - url: /api
+  - url: https://weather-geeks-corner.test/api
+
+tags:
+  - name: Weather
+    description: Endpoints that proxy/normalize NWS data for Kansas
+    externalDocs:
+      description: NWS API (Official)
+      url: https://api.weather.gov/openapi.json
+
+paths:
+  /weather/alerts/raw:
+    get:
+      tags: [Weather]
+      summary: GeoJSON passthrough of active alerts by area
+      parameters:
+        - in: query
+          name: state
+          schema: { type: string, example: KS }
+      externalDocs:
+        description: NWS — GET /alerts/active
+        url: https://api.weather.gov/openapi.json#/paths/~1alerts~1active/get
+      responses:
+        '200':
+          description: GeoJSON passthrough
+          content:
+            application/geo+json:
+              schema:
+                type: object
+              example:
+                type: FeatureCollection
+                features:
+                  - type: Feature
+                    properties:
+                      id: "urn:oid:2.49.0.1.840.0.123456"
+                      event: "Severe Thunderstorm Warning"
+                      areaDesc: "Sedgwick; Sumner"
+                      severity: "Severe"
+                      expires: "2025-05-05T22:00:00-05:00"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '502':
+          $ref: '#/components/responses/BadGateway'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /weather/alerts:
+    get:
+      tags: [Weather]
+      summary: Normalized alerts for UI display
+      parameters:
+        - in: query
+          name: state
+          schema: { type: string, example: KS }
+      externalDocs:
+        description: Source data NWS /alerts/active
+        url: https://api.weather.gov/openapi.json#/paths/~1alerts~1active/get
+      responses:
+        '200':
+          description: Normalized list of alerts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  source: { type: string }
+                  count: { type: integer }
+                  alerts:
+                    type: array
+                    items: { $ref: '#/components/schemas/WeatherAlert' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '502':
+          $ref: '#/components/responses/BadGateway'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /weather/forecast:
+    get:
+      tags: [Weather]
+      summary: Forecast by Kansas city
+      parameters:
+        - in: query
+          name: city
+          required: true
+          schema:
+            type: string
+            enum: [Wichita, Topeka, Dodge City, Kansas City, Independence]
+            example: Wichita
+      externalDocs:
+        description: NWS — GET /points/{lat},{lon}
+        url: https://api.weather.gov/openapi.json#/paths/~1points~1{point}/get
+      responses:
+        '200':
+          description: Daily + hourly forecast data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  city: { type: string }
+                  daily:
+                    type: array
+                    items: { $ref: '#/components/schemas/ForecastPeriod' }
+                  hourly:
+                    type: array
+                    items: { $ref: '#/components/schemas/HourlyPeriod' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '502':
+          $ref: '#/components/responses/BadGateway'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { error: "Bad Request", message: "Invalid parameter.", status: 400 }
+
+    BadGateway:
+      description: Upstream NWS failure
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { error: "Bad Gateway", message: "NWS request failed.", status: 502 }
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { error: "Internal Server Error", message: "Unexpected error.", status: 500 }
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+        message: { type: string }
+        status: { type: integer }
+
+    WeatherAlert:
+      type: object
+      properties:
+        id: { type: string }
+        event: { type: string }
+        severity: { type: string }
+        expires: { type: string }
+        areaDesc: { type: string }
+
+    ForecastPeriod:
+      type: object
+      properties:
+        name: { type: string }
+        temperature: { type: number }
+        detailedForecast: { type: string }
+
+    HourlyPeriod:
+      type: object
+      properties:
+        startTime: { type: string }
+        temperature: { type: number }
+        shortForecast: { type: string }
