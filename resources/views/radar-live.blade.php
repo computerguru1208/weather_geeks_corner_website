@@ -13,7 +13,7 @@
     <div id="map" style="height:600px; width:100%; margin-bottom:2rem;"></div>
 
     {{-- Alerts --}}
-    <div class="bg-dark text-warning p-4 rounded">
+    <div class="alert-box">
         <h4>Current Alerts</h4>
         <div id="alertsAccordion" class="accordion"></div>
     </div>
@@ -70,7 +70,7 @@
             "Flash Flood Warning",
             "Flood Warning",
         ];
-        fetch("https://api.weather.gov/alerts/active?area=KS")
+        fetch("/api/weather/alerts/raw?state=KS")
             .then((res) => res.json())
             .then((data) => {
                 if (window.alertLayers) window.alertLayers.forEach((l) => map.removeLayer(l));

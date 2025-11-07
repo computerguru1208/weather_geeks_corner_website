@@ -4,9 +4,9 @@
 <div class="container">
 
     <!-- Welcome Section -->
-    <div class="dark-banner mb-5">
-        <h2 class="fw-bold text-yellow">Welcome to The Weather Geek's Corner</h1>
-            <p class="lead">Your #1 source for Kansas weather — real-time alerts, local forecasts, and Kansas weather history.</p>
+    <div class="text-center bg-warning p-4 rounded mb-4">
+        <h1 class="fw-bold">Welcome to The Weather Geek's Corner</h1>
+        <p class="lead">Your #1 source for Kansas weather — real-time alerts, local forecasts, and Kansas weather history.</p>
     </div>
 
     <!-- Live Radar Section -->
