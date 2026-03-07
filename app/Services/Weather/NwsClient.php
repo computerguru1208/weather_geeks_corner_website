@@ -3,40 +3,33 @@
 namespace App\Services\Weather;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\RequestException;
 
 class NwsClient
 {
-    private function http()
+    protected array $headers = [
+        'User-Agent' => 'Weather Geeks Corner (your-email@example.com)',
+        'Accept' => 'application/geo+json',
+    ];
+
+    public function get(string $url): array
     {
-        return Http::withHeaders([
-            'User-Agent' => '(weathergeekscorner.com; contact: your@email)',
-            'Accept'     => 'application/geo+json, application/json'
-        ])->timeout(10);
-    }
+        try {
+            $response = Http::withHeaders($this->headers)
+                ->timeout(15)
+                ->get($url);
 
-    public function alertsByArea(string $area = 'KS'): array
-    {
-        return $this->http()
-            ->get('https://api.weather.gov/alerts/active', ['area' => strtoupper($area)])
-            ->throw()->json();
-    }
+            if (!$response->successful()) {
+                return [];
+            }
 
-    public function points(float $lat, float $lon): array
-    {
-        return $this->http()
-            ->get("https://api.weather.gov/points/{$lat},{$lon}")
-            ->throw()->json();
-    }
-
-    public function forecastFromPoints(array $points): array
-    {
-        $dailyUrl  = $points['properties']['forecast']       ?? null;
-        $hourlyUrl = $points['properties']['forecastHourly'] ?? null;
-        abort_if(!$dailyUrl || !$hourlyUrl, 500, 'NWS points resolution failed');
-
-        $daily  = $this->http()->get($dailyUrl)->throw()->json();
-        $hourly = $this->http()->get($hourlyUrl)->throw()->json();
-
-        return compact('daily', 'hourly');
+            return $response->json() ?? [];
+        } catch (RequestException $e) {
+            report($e);
+            return [];
+        } catch (\Throwable $e) {
+            report($e);
+            return [];
+        }
     }
 }

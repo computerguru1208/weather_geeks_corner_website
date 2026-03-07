@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WeatherController;
 use App\Http\Controllers\BlogController; // <-- add this import
+use App\Models\WeatherAlert;
+use App\Models\ForecastSnapshot;
 
 // Home + alerts pages (server-rendered)
 Route::get('/', [WeatherController::class, 'index']);
@@ -24,3 +26,10 @@ Route::get('/api/openapi.yaml', function () {
 
 // Optional: a simple, CDN-backed docs page (great for quick verification)
 Route::view('/api/docs-standalone', 'swagger-standalone')->name('docs.standalone');
+
+Route::get('/debug/weather', function () {
+    return response()->json([
+        'alerts' => WeatherAlert::latest()->take(10)->get(),
+        'forecasts' => ForecastSnapshot::latest()->take(10)->get(),
+    ]);
+});
