@@ -18,6 +18,7 @@
                         url: "/api/openapi.yaml",
                         name: "Weather Proxy (Your Site)"
                     },
+                    // Optional extra reference:
                     {
                         url: "https://api.weather.gov/openapi.json",
                         name: "NWS API (Official)"

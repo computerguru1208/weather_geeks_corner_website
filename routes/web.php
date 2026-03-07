@@ -22,4 +22,5 @@ Route::get('/api/openapi.yaml', function () {
     return response(File::get($path), 200, ['Content-Type' => 'application/yaml']);
 })->name('openapi.yaml');
 
-Route::view('/api/docs-standalone', 'swagger-standalone');
+// Optional: a simple, CDN-backed docs page (great for quick verification)
+Route::view('/api/docs-standalone', 'swagger-standalone')->name('docs.standalone');
